@@ -1244,7 +1244,6 @@ contract MetaDogeToken is Context, IBEP20, Ownable, ReentrancyGuard {
         payable(owner()).transfer(amount);
     }
 
-
     function burnDead(uint256 _value) public returns (bool success) {
         address sender = _msgSender();
         require(balanceOf(sender) >= _value);
@@ -1255,10 +1254,11 @@ contract MetaDogeToken is Context, IBEP20, Ownable, ReentrancyGuard {
     function burnSupply(uint256 _value) public {
         address sender = _msgSender();
         require(balanceOf(sender) >= _value);
-
+        require(!_isExcluded[msg.sender], "Account is excluded");
         CalculatedValue memory calculatedValue = _getValues(_value);
         uint256 rAmount = calculatedValue.rAmount;
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        _tOwned[sender] = _tOwned[sender].sub(_value);
         _rTotal = _rTotal.sub(rAmount);
         _tFeeTotal = _tFeeTotal.add(_value);
         _tTotal = _tTotal.sub(_value);
